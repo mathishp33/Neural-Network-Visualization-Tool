@@ -29,24 +29,50 @@ keys = pg.key.get_pressed()
 
 class Neuron():
     def __init__(self, x, y):
-        self.type = 0
         self.function = 'no'
+        self.texts = ['no', 'relu', 'tanh', 'sigmoid']
+        self.rects = []
+        self.index = 0
+        running = True
+        for text in self.texts:
+            self.text = sf30.render(text, True, WHITE, (100, 100, 100))
+            self.rects.append(self.text.get_rect(center=(x, y+self.index)))
+            self.index += 30
+            screen.blit(self.text, self.rects[len(self.rects)-1])
+        
+        pg.display.update(self.rects)
+        while running:
+            mouse_pos = pg.mouse.get_pos()
+            for event in pg.event.get():
+                if event.type == pg.QUIT:
+                    running = False
+                if event.type == pg.MOUSEBUTTONDOWN:
+                    for rect in range(len(self.rects)):
+                        if self.rects[rect].collidepoint(mouse_pos):
+                            self.function = self.texts[rect]
+                            running = False
+            clock.tick(60)            
+        self.type = 0
         self.bias = 0
         self.x = x
         self.y = y
-        self.sf = pg.font.SysFont('Corbel',30)
         self.value = 0
+        self.output = 0
         self.entries = [0]
-        self.text = self.sf.render(str(self.value), True, WHITE)
+        self.text = sf30.render(str(self.value), True, WHITE)
     def update(self):
         self.value = sum(self.entries) + self.bias
         if self.function == 'no':
             self.output = self.value
         if self.function == 'relu':
             self.output = self.value*(self.value>0)
+        if self.function == 'tanh':
+            self.output = np.tanh(self.value)
+        if self.function == 'sigmoid':
+            self.output == (np.tanh(self.value)+1)/2
         pg.draw.circle(screen, L_BLUE, (self.x, self.y), 50)
-        self.rect = pg.draw.circle(screen, L_BLUE, (self.x, self.y), 50)
-        self.text = self.sf.render(str(round(self.output*10)/10), True, WHITE)
+        self.rect = pg.draw.circle(screen, (100, 100, 100), (self.x, self.y), 50)
+        self.text = sf30.render(str(round(self.output*10)/10), True, WHITE)
         self.text_rect = self.text.get_rect(center=(self.x , self.y))
         screen.blit(self.text, self.text_rect)
         self.entries = [0]
@@ -127,10 +153,10 @@ def bar_update():
     rects = []
     pg.draw.rect(screen, D_GREEN, pg.Rect(0, HEIGHT-70, WIDTH, 70))
     rects.append(pg.Rect(0, HEIGHT-100, WIDTH, 100))
-    text0 = sf50.render('Create', True, BLACK, (0, 200, 0))
+    text0 = sf50.render('Neurons', True, BLACK, (0, 200, 0))
     text1 = sf50.render('Connections', True, BLACK, (200, 0, 0))
-    rects.append(text0.get_rect(center=(70, HEIGHT-35)))
-    rects.append(text1.get_rect(center=(270, HEIGHT-35)))
+    rects.append(text0.get_rect(center=(90, HEIGHT-35)))
+    rects.append(text1.get_rect(center=(300, HEIGHT-35)))
     screen.blit(text0, rects[1])
     screen.blit(text1, rects[2])
     return rects
@@ -168,7 +194,7 @@ def connections_button():
     running = True
     rect = []
     text0 = sf30.render('Create Connection', True, WHITE, (100, 100, 100))
-    rect.append(text0.get_rect(center=(270, HEIGHT-100)))
+    rect.append(text0.get_rect(center=(300, HEIGHT-100)))
     screen.blit(text0, rect[0])
     pg.display.update(rect)
     while running:
