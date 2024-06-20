@@ -53,7 +53,6 @@ class Neuron():
                             running = False
             clock.tick(60)            
         self.type = 0
-        self.bias = 0
         self.x = x
         self.y = y
         self.value = 0
@@ -61,7 +60,7 @@ class Neuron():
         self.entries = [0]
         self.text = sf30.render(str(self.value), True, WHITE)
     def update(self):
-        self.value = sum(self.entries) + self.bias
+        self.value = sum(self.entries)
         if self.function == 'no':
             self.output = self.value
         if self.function == 'relu':
@@ -141,12 +140,15 @@ class Connection():
         self.bias = arg1[1][1]
         self.pos1 = self.n1.x, self.n1.y
         self.pos2 = self.n2.x, self.n2.y
+        self.color = WHITE
+        self.rect = pg.draw.line(screen, self.color, self.pos1, self.pos2, 5)
     def update(self):
         self.pos1 = self.n1.x, self.n1.y
         self.pos2 = self.n2.x, self.n2.y
         if self.n2.type != 1:
             self.n2.entries.append(self.n1.value*self.weight + self.bias)
-        pg.draw.line(screen, BLUE, self.pos1, self.pos2, 5)
+        self.rect = pg.draw.line(screen, self.color, self.pos1, self.pos2, 5)
+        pg.draw.line(screen, self.color, self.pos1, self.pos2, 5)
         
         
 def bar_update():
@@ -155,10 +157,13 @@ def bar_update():
     rects.append(pg.Rect(0, HEIGHT-100, WIDTH, 100))
     text0 = sf50.render('Neurons', True, BLACK, (0, 200, 0))
     text1 = sf50.render('Connections', True, BLACK, (200, 0, 0))
+    text2 = sf50.render('Remove', True, BLACK, (135, 206, 235))
     rects.append(text0.get_rect(center=(90, HEIGHT-35)))
-    rects.append(text1.get_rect(center=(300, HEIGHT-35)))
+    rects.append(text1.get_rect(center=(320, HEIGHT-35)))
+    rects.append(text2.get_rect(center=(550, HEIGHT-35)))
     screen.blit(text0, rects[1])
     screen.blit(text1, rects[2])
+    screen.blit(text2, rects[3])
     return rects
 
 def create_button():
@@ -190,11 +195,12 @@ def create_button():
                     return sub_create_button(2, rect)
                 return False
         clock.tick(60)
+        
 def connections_button():
     running = True
     rect = []
     text0 = sf30.render('Create Connection', True, WHITE, (100, 100, 100))
-    rect.append(text0.get_rect(center=(300, HEIGHT-100)))
+    rect.append(text0.get_rect(center=(320, HEIGHT-100)))
     screen.blit(text0, rect[0])
     pg.display.update(rect)
     while running:
@@ -227,6 +233,7 @@ def sub_create_button(typeofneuron, rect):
                         return 'canceled'
                 return mouse_pos[0], mouse_pos[1], typeofneuron
         clock.tick(60)
+        
 def input_boxes(n1, n2):
     mid_point = ((n1.x+n2.x)/2, 
             (n1.y+n2.y)/2)
@@ -260,6 +267,7 @@ def input_boxes(n1, n2):
         try: parameters.append(float(entry))
         except: parameters.append(0)
     return parameters
+
 def sub_connections(cancel_rect):
     output = [0, 0]
     count = 0
@@ -282,6 +290,48 @@ def sub_connections(cancel_rect):
                             return output, parameters
                         count += 1
                         time.sleep(0.2)
+        clock.tick(60)
+
+def sub_remove(element):
+    running = True
+    while running:
+        mouse_pos = pg.mouse.get_pos()
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                return True
+            if event.type == pg.MOUSEBUTTONDOWN:
+                if element == 1:
+                    for item in range(len(neurons)):
+                        if neurons[item].rect.collidepoint(mouse_pos):
+                            return element, item
+                else:
+                    for item in range(len(connections)):
+                        if connections[item].rect.collidepoint(mouse_pos):
+                            return element, item
+                return 'canceled'
+        clock.tick(60)
+def remove_button():
+    running = True
+    rect = []
+    text0 = sf30.render('Remove Connection', True, WHITE, (255, 0, 0))
+    text1 = sf30.render('Remove Neuron', True, WHITE, (0, 255, 0))
+    rect.append(text0.get_rect(center=(550, HEIGHT-100)))
+    rect.append(text1.get_rect(center=(550, HEIGHT-150)))
+    screen.blit(text0, rect[0])
+    screen.blit(text1, rect[1])
+    pg.display.update(rect)
+    while running:
+        mouse_pos = pg.mouse.get_pos()
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                return True
+            if event.type == pg.MOUSEBUTTONDOWN:
+                if rects[3].collidepoint(mouse_pos):
+                    return 'canceled'
+                if rect[0].collidepoint(mouse_pos):
+                    return sub_remove(0)
+                if rect[1].collidepoint(mouse_pos):
+                    return sub_remove(1)
         clock.tick(60)
 
 running = True
@@ -315,7 +365,16 @@ while running:
                         running = False
                     else:
                         connections.append(Connection(output))
-    
+            if rects[3].collidepoint(mouse_pos):
+                output = remove_button()
+                if output != 'canceled':
+                    if output == True:
+                        running = False
+                    else:
+                        if output[0] == 0:
+                            connections.pop(output[1])
+                        else:
+                            neurons.pop(output[1])
     if len(connections) != 0:
         for i in connections:
             i.update()
