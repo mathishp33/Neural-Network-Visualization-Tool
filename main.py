@@ -2,6 +2,7 @@ import numpy as np
 import math
 import pygame as pg
 import time
+import pickle
 
 RES = WIDTH, HEIGHT = 1500, 750
 screen = pg.display.set_mode(RES)
@@ -153,17 +154,18 @@ class Connection():
         
 def bar_update():
     rects = []
-    pg.draw.rect(screen, D_GREEN, pg.Rect(0, HEIGHT-70, WIDTH, 70))
+    pg.draw.rect(screen, (150, 150, 150), pg.Rect(0, HEIGHT-70, WIDTH, 70))
     rects.append(pg.Rect(0, HEIGHT-100, WIDTH, 100))
-    text0 = sf50.render('Neurons', True, BLACK, (0, 200, 0))
-    text1 = sf50.render('Connections', True, BLACK, (200, 0, 0))
-    text2 = sf50.render('Remove', True, BLACK, (135, 206, 235))
-    rects.append(text0.get_rect(center=(90, HEIGHT-35)))
-    rects.append(text1.get_rect(center=(320, HEIGHT-35)))
-    rects.append(text2.get_rect(center=(550, HEIGHT-35)))
-    screen.blit(text0, rects[1])
-    screen.blit(text1, rects[2])
-    screen.blit(text2, rects[3])
+    headers = [sf50.render('File', True, WHITE, (30, 30, 30)),
+                sf50.render('Neurons', True, WHITE, (30, 30, 30)), 
+               sf50.render('Connections', True, WHITE, (30, 30, 30)), 
+               sf50.render('Remove', True, WHITE, (30, 30, 30)), 
+               ]
+    margin = 20
+    for header in headers:
+        rects.append(header.get_rect(midleft=(margin, HEIGHT-35)))
+        screen.blit(header, rects[len(rects)-1])
+        margin = margin + 20 + rects[len(rects)-1][2]
     return rects
 
 def create_button():
@@ -346,7 +348,7 @@ while running:
             running = False
         if event.type == pg.MOUSEBUTTONDOWN:
             mouse_click = True
-            if rects[1].collidepoint(mouse_pos):
+            if rects[2].collidepoint(mouse_pos):
                 output = create_button()
                 if output != 'canceled':
                     if output == True: 
@@ -358,14 +360,14 @@ while running:
                             neurons.append(InputNeuron(output[0], output[1]))
                         elif output[2] == 2:
                             neurons.append(OutputNeuron(output[0], output[1]))
-            if rects[2].collidepoint(mouse_pos):
+            if rects[3].collidepoint(mouse_pos):
                 output = connections_button()
                 if output != 'canceled':
                     if output == True:
                         running = False
                     else:
                         connections.append(Connection(output))
-            if rects[3].collidepoint(mouse_pos):
+            if rects[4].collidepoint(mouse_pos):
                 output = remove_button()
                 if output != 'canceled':
                     if output == True:
