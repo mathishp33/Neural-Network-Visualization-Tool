@@ -101,8 +101,8 @@ class InputNeuron():
                 for event in pg.event.get():
                     if event.type == pg.QUIT:
                         running = False
-                    if event.type == pg.MOUSEBUTTONDOWN or event.type == pg.K_RETURN or event.type == pg.K_SPACE:
-                            running = False
+                    if event.key == pg.MOUSEBUTTONDOWN or event.key == pg.K_RETURN or event.key == pg.K_SPACE:
+                        running = False
                     if event.type == pg.KEYDOWN:
                         if event.key == pg.K_BACKSPACE:
                             self.input = self.input[:-1]
