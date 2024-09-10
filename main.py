@@ -187,15 +187,13 @@ def create_button():
             if event.type == pg.QUIT:
                 return True
             if event.type == pg.MOUSEBUTTONDOWN:
-                if rects[1].collidepoint(mouse_pos):
-                    return 'canceled'
                 if rect[0].collidepoint(mouse_pos):
                     return sub_create_button(0, rect)
                 if rect[1].collidepoint(mouse_pos):
                     return sub_create_button(1, rect)
                 if rect[2].collidepoint(mouse_pos):
                     return sub_create_button(2, rect)
-                return False
+                return 'canceled'
         clock.tick(60)
         
 def connections_button():
@@ -211,11 +209,9 @@ def connections_button():
             if event.type == pg.QUIT:
                 return True
             if event.type == pg.MOUSEBUTTONDOWN:
-                if rects[2].collidepoint(mouse_pos):
-                    return 'canceled'
                 if rect[0].collidepoint(mouse_pos):
                     return sub_connections(rect[0])
-                return False
+                return 'canceled'
         clock.tick(60)
         
 def sub_create_button(typeofneuron, rect):
