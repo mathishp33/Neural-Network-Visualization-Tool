@@ -170,6 +170,21 @@ def bar_update():
         margin = margin + 20 + rects[len(rects)-1][2]
     return rects
 
+def file_button():
+    running = True
+    rect = []
+    text0 = sf30.render('Load File', True, WHITE, (100, 100, 100))
+    rect.append(text0.get_rect(center=(100, HEIGHT-100)))
+    text1 = sf30.render('Save File', True, WHITE, (0, 200, 0))
+    rect.append(text1.get_rect(center=(100, HEIGHT-150)))
+    screen.blit(text0, rect[0])
+    screen.blit(text1, rect[1])
+    pg.display.update(rect)
+    while running:
+        mous_pos = pg.mouse.get_pos()
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                return True
 def create_button():
     running = True
     rect = []
@@ -345,6 +360,10 @@ while running:
             running = False
         if event.type == pg.MOUSEBUTTONDOWN:
             mouse_click = True
+            if rects[1].collidepoint(mouse_pos):
+                output = file_button()
+                if output == True:
+                    running = False
             if rects[2].collidepoint(mouse_pos):
                 output = create_button()
                 if output != 'canceled':
