@@ -324,12 +324,11 @@ def remove_button():
             if event.type == pg.QUIT:
                 return True
             if event.type == pg.MOUSEBUTTONDOWN:
-                if rects[3].collidepoint(mouse_pos):
-                    return 'canceled'
                 if rect[0].collidepoint(mouse_pos):
                     return sub_remove(0)
                 if rect[1].collidepoint(mouse_pos):
                     return sub_remove(1)
+                return 'canceled'
         clock.tick(60)
 
 running = True
