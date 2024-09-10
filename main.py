@@ -101,14 +101,16 @@ class InputNeuron():
                 for event in pg.event.get():
                     if event.type == pg.QUIT:
                         running = False
+                    if event.type == pg.MOUSEBUTTONDOWN or event.type == pg.K_RETURN or event.type == pg.K_SPACE:
+                            running = False
                     if event.type == pg.KEYDOWN:
                         if event.key == pg.K_BACKSPACE:
                             self.input = self.input[:-1]
                         else:
-                            try : self.input += event.unicode
+                            try : 
+                                if event.unicode != ' ' or '/n':
+                                    self.input += event.unicode
                             except: pass
-                        if event.key == pg.K_RETURN:
-                            running = False
                 self.text = self.sf.render(self.input, True, YELLOW)
                 self.text_rect = self.text.get_rect(center=(self.x , self.y))
                 screen.blit(self.text, self.text_rect)
